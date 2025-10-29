@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ target.project }}"
+    schema: "{{ target.schema }}"
+    loader: bigquery
+    description: Raw Greenweez data loaded into BigQuery. Environment-specific schema is resolved via {{ target.schema }}.
+    freshness: 
+      error_after:
+        count: 48
+        period: hour
+      warn_after:
+        count: 24
+        period: hour
+
+    tables:
+      - name: sales
+        identifier: raw_gz_sales
+        description: Raw line items (order+product granularity) with turnover & purchase cost.
+      - name: product
+        identifier: raw_gz_product
+        description: Product master with purchase price.
+      - name: ship
+        identifier: raw_gz_ship
+        description: Shipping costs per order with shipping_fee, ship_cost, log_cost.
+
+

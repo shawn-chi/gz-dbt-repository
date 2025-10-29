@@ -2,8 +2,8 @@ version: 2
 
 sources:
   - name: raw
-    database: "{{ target.project }}"
-    schema: "{{ target.schema }}"
+    database: "woven-invention-475010-a4"
+    schema: "gz_raw_data"
     loader: bigquery
     description: Raw Greenweez data loaded into BigQuery. Environment-specific schema is resolved via {{ target.schema }}.
     freshness: 

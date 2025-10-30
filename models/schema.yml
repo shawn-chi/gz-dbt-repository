@@ -1,0 +1,71 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "woven-invention-475010-a4"
+    schema: "gz_raw_data"
+    loader: bigquery
+    description: Raw Greenweez data loaded into BigQuery. Environment-specific schema is resolved via {{ target.schema }}.
+
+
+    tables:
+    # Sales 
+      - name: sales
+        identifier: raw_gz_sales
+        description: Raw line items (order+product granularity) with turnover & purchase cost.
+
+        loaded_at_field: date_date
+        freshness: 
+          warn_after:
+            count: 90
+            period: day
+          error_after:
+            count: 120
+            period: day
+          
+        columns:
+          - name: date_date
+            description: Date of purchase (order date).
+            tests: [not_null]
+            
+          - name: orders_id
+            description: Order identifier.
+            tests: [not_null]
+
+          - name: pdt_id
+            description: Product identifier in the raw layer.
+            tests: [not_null]
+
+          - name: quantity
+            description: Quantity purchased for this line item.
+            tests: [not_null]
+      
+        tests:
+          - unique:
+              column_name: "concat(cast(orders_id as string), '|', cast(pdt_id as string))"
+
+    # Product
+      - name: product
+        identifier: raw_gz_product
+        description: Product master with purchase price.
+
+        columns:
+          - name: products_id
+            tests: [not_null, unique]
+          - name: purchSE_PRICE
+            tests: [not_null]
+
+    #Ship
+      - name: ship
+        identifier: raw_gz_ship
+        description: Shipping costs per order with shipping_fee, ship_cost, log_cost.
+        
+        columns:
+          - name: orders_id
+            tests: [not_null, unique]
+          - name: shipping_fee 
+          - name: shipping_fee_1
+          - name: logCost
+          - name: ship_cost
+
+
